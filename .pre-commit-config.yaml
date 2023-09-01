@@ -1,0 +1,9 @@
+---
+#
+# Pre-commit config file.
+#
+default_language_version:
+  python: python3
+default_stages: [commit]
+repos: []
+...
