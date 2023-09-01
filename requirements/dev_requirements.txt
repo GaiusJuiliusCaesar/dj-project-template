@@ -1,0 +1,21 @@
+-i https://pypi.org/simple
+asgiref==3.7.2; python_version >= '3.7'
+black==23.7.0; python_version >= '3.8'
+click==8.1.7; python_version >= '3.7'
+django==4.2.4; python_version >= '3.8'
+django-debug-toolbar==4.2.0; python_version >= '3.8'
+django-sslserver==0.22
+mypy-extensions==1.0.0; python_version >= '3.5'
+packaging==23.1; python_version >= '3.7'
+pathspec==0.11.2; python_version >= '3.7'
+platformdirs==3.10.0; python_version >= '3.7'
+sqlparse==0.4.4; python_version >= '3.5'
+dj-database-url==2.1.0
+dj-email-url==1.0.6
+django-cache-url==3.4.4
+django-csp==3.7
+django-redis==5.3.0; python_version >= '3.6'
+gunicorn==21.2.0; python_version >= '3.5'
+psycopg2-binary==2.9.7; python_version >= '3.6'
+redis==5.0.0; python_version >= '3.7'
+typing-extensions==4.7.1; python_version >= '3.7'
