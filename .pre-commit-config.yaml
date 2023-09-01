@@ -1,0 +1,16 @@
+---
+#
+# Pre-commit config file.
+#
+default_language_version:
+  python: python3
+default_stages: [pre-commit]
+repos:
+  - repo: local
+    hooks:
+      - id: migrations-check
+        language: system
+        name: Check for uncreated migrations.
+        entry: sh -c "dotenvx run -- python manage.py makemigrations --check --dry-run"
+        files: "models\\.py$"
+...
