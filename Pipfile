@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+psycopg2-binary = "*"
+gunicorn = "*"
+dj-database-url = "*"
+dj-email-url = "*"
+django-redis = "*"
+django-cache-url = "*"
+django-cors-headers = "*"
+django = "*"
+django-crontab = "*"
+django-compressor = "*"
+django-csp = "*"
+
+[dev-packages]
+black = "*"
+pyopenssl = "*"
+django-sslserver = "*"
+
+[requires]
+python_version = "3.12"
