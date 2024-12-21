@@ -1,0 +1,14 @@
+[Unit]
+Description=Django gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+User=user
+Group=nginx
+WorkingDirectory=/home/user/Projects/dj_project_name
+EnvironmentFile=/home/user/.venv/dj_project_name/bin/envfile
+ExecStart=/home/linuxbrew/.linuxbrew/bin/dotenvx run -- /home/user/.venv/dj_project_name/bin/gunicorn --timeout 300 --reload --user user --group nginx --access-logfile /var/log/gunicorn/django.log --error-logfile /var/log/gunicorn/django.log --workers 3 --bind 127.0.0.1:9000 --log-level debug {{ project_name }}.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
