@@ -186,6 +186,12 @@ CACHE_URL='redis://127.0.0.1:6379/1'
 DJANGO_SUPERUSER_USERNAME='djadmin'
 DJANGO_SUPERUSER_EMAIL='projectadmin@domain.tld'
 DJANGO_SUPERUSER_PASSWORD='Subheader8_Collide0_Width7_Postbox3_Flagstick3'
+
+#
+# SSL CERTIFICATE VERIFICATION
+#
+REQUESTS_CA_BUNDLE='${HOME}/.local/share/mkcert/rootCA.pem'
+CURL_CA_BUNDLE='${REQUESTS_CA_BUNDLE}'
 ```
 
   - Encrypt the **.env** file as following.

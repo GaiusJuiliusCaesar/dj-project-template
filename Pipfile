@@ -22,4 +22,4 @@ pyopenssl = "*"
 django-sslserver = "*"
 
 [requires]
-python_version = "3.12.7"
+python_version = "3.12"
