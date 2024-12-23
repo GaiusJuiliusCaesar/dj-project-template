@@ -298,7 +298,7 @@ alias sshpass="sshpass -f ~/.sshpass"
 alias runsslserver="sshpass sudo \
   DOTENV_PRIVATE_KEY=your_development_private_key_you_find_in_dot_env_keys_file \
   /home/linuxbrew/.linuxbrew/bin/dotenvx run -- \
-  /home/sraja/.Envs/DJPT/bin/python manage.py runsslserver \
+  /home/user/.Envs/DJPT/bin/python manage.py runsslserver \
   --certificate ssl/cert.pem \
   --key ssl/key.pem \
   127.0.0.1:443"
