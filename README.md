@@ -64,19 +64,22 @@ $ chmod 0600 ~/.sshpass
 ```
 ```sh
 $ sshpass sudo dnf -y install nss-tools certbot nginx rsync cronie crontabs cronie-anacron
-$ brew install nss mkcert sshpass pipenv virtualenvwrapper nodejs
+$ brew install nss mkcert sshpass pipenv virtualenvwrapper nodejs pnpm
 $ brew service start redis
 $ redis-cli PING
 PONG
+$ export CAROOT=/etc/nginx/ssl
+$ sshpass sudo chown user:user /etc/nginx/ssl
+$ sshpass sudo chmod 0755 /etc/nginx/ssl
 $ mkcert -install
 $ mkcert -CAROOT
-/home/user/.local/share/mkcert
+/etc/nginx/ssl
 ```
 
-  - Import the **/home/user/.local/mkcert/rootCA.pem** to your browser. **Example:** chrome://certificate-manager/
+  - Import the **/etc/nginx/ssl/rootCA.pem** to your browser. **Example:** chrome://certificate-manager/
   - Create your project directory as following.
 ```sh
-$ mkvirtualenv -p python3.12 dj_project_name
+$ mkvirtualenv  dj_project_name
 $ mkdir -pv $HOME/Projects/dj_project_name/ssl
 $ cd $HOME/Projects/dj_project_name
 $ mkcert -key-file ssl/key.pem \
@@ -371,7 +374,9 @@ $ cat /etc/logrotate.d/gunicorn
 ```sh
 $ sshpass sudo mkdir -pv /etc/nginx/ssl /etc/nginx/htpasswd /var/www/default
 $ sshpass sudo openssl dhparam -out /etc/nginx/ssl/dhparams.pem 4096
+$ sshpass sudo cp -av /home/user/.local/share/mkcert/rootCA.pem /etc/nginx/ssl/
 $ cd $HOME/Projects/dj_project_name
+$ sshpass sudo cp -av ssl/*.pem /etc/nginx/ssl/
 $ sshpass sudo rsync -Pavz misc/nginx/etc/ /etc/nginx/
 $ sshpass sudo rsync -Pavz misc/nginx/default/ /var/www/default/
 $ sshpass sudo rsync -Pavz misc/gunicorn/ /etc/systemd/system/
