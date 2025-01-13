@@ -1,30 +1,37 @@
-
 # Django Project Template
 
 ## Introduction
+
 Create a website/application using Django using this template.
 
 ## Prerequisites
-  - Windows 10/11 with WSL installed.
-  - RHEL(AlmaLinux or RockyLinux or Fedora) Linux Desktop.
+
+- Windows 10/11 with WSL installed.
+- RHEL(AlmaLinux or RockyLinux or Fedora) Linux Desktop.
 
 ## Basic Setup
-  - Login into your Liunx Desktop or WSL.
-  - Install Homebrew as following with  user having sudo privileges.
+
+- Login into your Liunx Desktop or WSL.
+- Install Homebrew as following with  user having sudo privileges.
+
 ```sh
 $ whoami
 user
 ```
+
 ```sh
 $ sudo -l
 ```
+
 ```sh
 $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
+
 <details>
   <summary><span style="color: red;">Expand</span></summary>
 
-  - Edit and add the following in your user profile **~/.bashrc** or **~/.bash_profile** or **~/.profile**
+- Edit and add the following in your user profile **~/.bashrc** or **~/.bash_profile** or **~/.profile**
+
 ```sh
 $ cat ~/.bashrc
 #
@@ -52,31 +59,39 @@ source /home/linuxbrew/.linuxbrew/bin/virtualenvwrapper.sh
 
 </details>
 
-  - Logout and Login or open a new tab in your terminal.
+- Logout and Login or open a new tab in your terminal.
+
 ```sh
 $ brew install git libpq pre-commit bash-completion django-completion dotenvx/brew/dotenvx redis
 ```
-  - Create the file as following and set the permission.
+
+- Create the file as following and set the permission.
+
 ```sh
 $ vim ~/.sshpass
 my_user_password_sudo
 $ chmod 0600 ~/.sshpass
 ```
+
 ```sh
 $ sshpass sudo dnf -y install nss-tools certbot nginx rsync cronie crontabs cronie-anacron
-$ brew install nss mkcert sshpass pipenv virtualenvwrapper nodejs
+$ brew install nss mkcert sshpass pipenv virtualenvwrapper nodejs pnpm
 $ brew service start redis
 $ redis-cli PING
 PONG
+$ export CAROOT=/etc/nginx/ssl
+$ sshpass sudo chown user:user /etc/nginx/ssl
+$ sshpass sudo chmod 0755 /etc/nginx/ssl
 $ mkcert -install
 $ mkcert -CAROOT
-/home/user/.local/share/mkcert
+/etc/nginx/ssl
 ```
 
-  - Import the **/home/user/.local/mkcert/rootCA.pem** to your browser. **Example:** chrome://certificate-manager/
-  - Create your project directory as following.
+- Import the **/etc/nginx/ssl/rootCA.pem** to your browser. **Example:** chrome://certificate-manager/
+- Create your project directory as following.
+
 ```sh
-$ mkvirtualenv -p python3.12 dj_project_name
+$ mkvirtualenv  dj_project_name
 $ mkdir -pv $HOME/Projects/dj_project_name/ssl
 $ cd $HOME/Projects/dj_project_name
 $ mkcert -key-file ssl/key.pem \
@@ -84,13 +99,17 @@ $ mkcert -key-file ssl/key.pem \
     domain.tld "*.domain.tld" \
     localhost 127.0.0.1 ::1
 ```
-  - Now, install the django package and create project using this template.
+
+- Now, install the django package and create project using this template.
+
 ```sh
 $ workon dj_project_name
 $ python -m pip install django
 $ django-admin startproject --template=https://github.com/GaiusJuiliusCaesar/dj-project-template/archive/main.zip dj_project_name .
 ```
-  - Then, edit and update the environment variables in **.env**
+
+- Then, edit and update the environment variables in **.env**
+
 <details>
   <summary><span style="color: red;">Expand</span></summary>
 
@@ -98,6 +117,7 @@ $ django-admin startproject --template=https://github.com/GaiusJuiliusCaesar/dj-
 $ ./generate_secret_key.py
 *n^6=76@%pqtn(k2onh_@e%!psv@*dt08yv)vwdvmlqn6s628(
 ```
+
 ```sh
 $ vim .env
 #
@@ -194,18 +214,22 @@ REQUESTS_CA_BUNDLE='${HOME}/.local/share/mkcert/rootCA.pem'
 CURL_CA_BUNDLE='${REQUESTS_CA_BUNDLE}'
 ```
 
-  - Encrypt the **.env** file as following.
+- Encrypt the **.env** file as following.
+
 ```sh
 $ dotenvx encrypt
 # Do not push this file without encrypt it.
 ```
-  - To create a seperate file for production use **.env.production** as mentioned in [Advance Dotenvx](https://dotenvx.com/docs/advanced/run-dotenv-private-key-multiple.html)
+
+- To create a seperate file for production use **.env.production** as mentioned in [Advance Dotenvx](https://dotenvx.com/docs/advanced/run-dotenv-private-key-multiple.html)
+
 ```sh
 $ vim .env.production
 $ dotenvx encrypt -f .env.production
 # To decrypt (Do not push this file without encrypt it.)
 $ dotenvx decrypt -f .env.production
 ```
+
 ```sh
 # Copy the private keys to your Password Manager and delete the .env.keys.
 $ rm -rf .env.keys
@@ -213,7 +237,8 @@ $ rm -rf .env.keys
 
 </details>
 
-  - Add the following lines in file **/etc/hosts** in your **WSL** or **Linux Desktop**.
+- Add the following lines in file **/etc/hosts** in your **WSL** or **Linux Desktop**.
+
 <details>
   <summary><span style="color: red;">Expand</span></summary>
 
@@ -228,7 +253,8 @@ $ cat /etc/hosts
 
 </details>
 
-  - Add the following lines in file **C:\Windows\System32\drivers\etc\hosts** if your are using WSL.
+- Add the following lines in file **C:\\Windows\\System32\\drivers\\etc\\hosts** if your are using WSL.
+
 <details>
   <summary><span style="color: red;">Expand</span></summary>
 
@@ -243,27 +269,36 @@ $ Get-Content C:\Windows\System32\drivers\etc\hosts
 
 </details>
 
-  - Install the required packages as following.
+- Install the required packages as following.
+
 ```sh
 $ pipenv install
 $ pipenv install --dev
 ```
-  - Add the **DOTENV_PRIVATE_KEY** to your virtual environment postactive file in **~/.venv/dj_project_name/bin/postactivate** that you copied from **.env.keys** to your **Password Manager**.
+
+- Add the **DOTENV_PRIVATE_KEY** to your virtual environment postactive file in **~/.venv/dj_project_name/bin/postactivate** that you copied from **.env.keys** to your **Password Manager**.
+
 ```sh
 $ vim ~/.venv/dj_project_name/bin/postactivate
 export DOTENV_PRIVATE_KEY="your_development_private_key_you_find_in_dot_env_keys_file"
 ```
-  - Update the file **~/.venv/dj_project_name/bin/postdeactivate**
+
+- Update the file **~/.venv/dj_project_name/bin/postdeactivate**
+
 ```sh
 $ vim ~/.venv/dj_project_name/bin/postactivate
 unset DOTENV_PRIVATE_KEY
 ```
-  - Deactivate and activate again as following.
+
+- Deactivate and activate again as following.
+
 ```sh
 $ deactivate
 $ workon dj_project_name
 ```
-  - Run the following command and verify the access using [localhost](https://localhost:8000) or your domain name [domain.tld](https://domain.tld:8000)
+
+- Run the following command and verify the access using [localhost](https://localhost:8000) or your domain name [domain.tld](https://domain.tld:8000)
+
 ```sh
 # Update the following file before verify the access.
 $ vim ~/.venv/dj_project_name/lib/python3.12/site-packages/sslserver/management/commands/runsslserver.py
@@ -280,6 +315,7 @@ class SecureHTTPServer(ThreadedWSGIServer):
 # Reference: https://github.com/teddziuba/django-sslserver/issues/111#issuecomment-2439592643
 
 ```
+
 ```sh
 $ dotenvx run -- python manage.py runsslserver \
     --certificate ssl/cert.pem \
@@ -288,7 +324,8 @@ $ dotenvx run -- python manage.py runsslserver \
 
 ## To run development server in SSL Port 443.
 
-  - Then, add the following lines in your project virtual environment profile **~/.venv/dj_project_name/bin/postactivate**
+- Then, add the following lines in your project virtual environment profile **~/.venv/dj_project_name/bin/postactivate**
+
 ```sh
 $ cat ~/.venv/dj_project_name/bin/postactivate
 #
@@ -303,14 +340,18 @@ alias runsslserver="sshpass sudo \
   --key ssl/key.pem \
   127.0.0.1:443"
 ```
-  - Update the file **~/.venv/dj_project_name/bin/postdeactivate**
+
+- Update the file **~/.venv/dj_project_name/bin/postdeactivate**
+
 ```sh
 $ cat ~/.venv/dj_project_name/bin/postdeactivate
 unset DOTENV_PRIVATE_KEY
 unalias sshpass
 unalias runsslserver
 ```
-  - Logout and Login or open a new tab
+
+- Logout and Login or open a new tab
+
 ```sh
 $ cd $HOME/Projects/dj_project_name
 $ runsslserver
@@ -326,37 +367,49 @@ Using SSL certificate: ssl/cert.pem
 Using SSL key: ssl/key.pem
 Quit the server with CONTROL-C.
 ```
-  - Verify the access using [localhost](https://localhost) or your domain name [domain.tld](https://domain.tld)
+
+- Verify the access using [localhost](https://localhost) or your domain name [domain.tld](https://domain.tld)
 
 ## SSL and Nginx Setup
-  - Run the following command to get your SSL certificate.
+
+- Run the following command to get your SSL certificate.
+
 ```sh
 $ sshpass sudo certbot certonly --manual --preferred-challenges dns-01 \
 	--domains domain.tld --domains *.domain.tld \
 	--email your_email_id@domain.tld \
 	--agree-tos --no-eff-email
 ```
+
 ```sh
 # Validate
 $ sshpass sudo certbot certificates
 ```
-  - Add the **nginx** service user to your user group.
+
+- Add the **nginx** service user to your user group.
+
 ```sh
 $ sshpass sudo usermod -a -G $(whoami) nginx
 $ getent group $(whoami)
 user:x:1000:user,nginx
 ```
-  - Change the permission of your user home directory
+
+- Change the permission of your user home directory
+
 ```sh
 $ chmod 0710 /home/user
 ```
-  - Create the following log directory set permissions and ownership.
+
+- Create the following log directory set permissions and ownership.
+
 ```sh
 $ sshpass sudo mkdir -pv /var/log/gunicorn
 $ sshpass sudo chmod 0711 /var/log/gunicorn
 $ sshpass sudo chown user:nginx /var/log/gunicorn
 ```
-  - Create the following logrotate file.
+
+- Create the following logrotate file.
+
 ```sh
 $ cat /etc/logrotate.d/gunicorn
 /var/log/gunicorn/*.log {
@@ -367,11 +420,15 @@ $ cat /etc/logrotate.d/gunicorn
   notifempty
 }
 ```
-  - Then, create the following directory and copy systemd service and nginx files as following. Update your path and accordingly in the configuration files.
+
+- Then, create the following directory and copy systemd service and nginx files as following. Update your path and accordingly in the configuration files.
+
 ```sh
 $ sshpass sudo mkdir -pv /etc/nginx/ssl /etc/nginx/htpasswd /var/www/default
 $ sshpass sudo openssl dhparam -out /etc/nginx/ssl/dhparams.pem 4096
+$ sshpass sudo cp -av /home/user/.local/share/mkcert/rootCA.pem /etc/nginx/ssl/
 $ cd $HOME/Projects/dj_project_name
+$ sshpass sudo cp -av ssl/*.pem /etc/nginx/ssl/
 $ sshpass sudo rsync -Pavz misc/nginx/etc/ /etc/nginx/
 $ sshpass sudo rsync -Pavz misc/nginx/default/ /var/www/default/
 $ sshpass sudo rsync -Pavz misc/gunicorn/ /etc/systemd/system/
@@ -390,13 +447,17 @@ $ sudo htpasswd -c /etc/nginx/htpasswd/.htpasswd user1
 # Update allow IP address to access the admin
 $ sshpass sudo vim /etc/nginx/conf.d/vh_domain.tld.conf
 ```
-  - Then, reload and start the service.
+
+- Then, reload and start the service.
+
 ```sh
 $ sshpass sudo systemctl daemon-reload
 $ sshpass sudo systemctl enable gunicorn.socket nginx.service
 $ sshpass sudo systemctl start gunicorn.socket gunicorn.service nginx.service
 ```
-  - Run the following commands
+
+- Run the following commands
+
 ```sh
 $ npm install -D tailwindcss
 $ npm install flowbite
@@ -409,13 +470,16 @@ $ dotenvx run -- python manage.py migrate
 $ dotenvx run -- python manage.py crontab add
 $ dotenvx run -- python manage.py crontab show
 ```
-  - Verify your django project app via curl and in your browser.
+
+- Verify your django project app via curl and in your browser.
+
 ```sh
 $ curl https://domain.tld
 ...
 <title>Home</title>
 ...
 ```
+
 ```sh
 $ curl -I --http2 https://domain.tld
 HTTP/2 200
@@ -425,11 +489,14 @@ x-page-generation-duration-ms: 1
 ```
 
 ## About HTTP/3
-  - You need to enable in your browser **chrome://flags#enable-quic** or **edge://flags/#enable-quic**
-  - For security reasons this is disabled by default.
+
+- You need to enable in your browser **chrome://flags#enable-quic** or **edge://flags/#enable-quic**
+- For security reasons this is disabled by default.
 
 ## Check Error logs
-  - Run the following command.
+
+- Run the following command.
+
 ```sh
 $ sshpass sudo tail -fn0 /var/log/gunicorn/django.log /var/log/nginx/domain.tld.error.log /var/log/nginx/domain.tld.access.log
 ==> /var/log/gunicorn/django.log <==
@@ -440,28 +507,38 @@ $ sshpass sudo tail -fn0 /var/log/gunicorn/django.log /var/log/nginx/domain.tld.
 ```
 
 ## Enable and Disable Debug mode.
-  - Run the following command to get the **DEBUG** status.
+
+- Run the following command to get the **DEBUG** status.
+
 ```sh
 $ dotenvx get DEBUG
 False
 ```
-  - To enable the **DEBUG** mode.
+
+- To enable the **DEBUG** mode.
+
 ```sh
 $ dotenvx set DEBUG True
 ✔ set DEBUG with encryption (.env)
 ```
+
 ```sh
 $ dotenvx get DEBUG
 True
 ```
-  - Then, stop the Nginx and Gunicorn service.
+
+- Then, stop the Nginx and Gunicorn service.
+
 ```sh
 $ sshpass sudo systemctl stop nginx gunicorn.socket gunicorn.service
 ```
-  - Run the development server to fix your issues.
+
+- Run the development server to fix your issues.
+
 ```sh
 $ runsslserver
 ```
 
 ## Conclusion
+
 That is it! You are ready to make changes in your project. Happy Coding!!

@@ -12,7 +12,7 @@
 #
 # Check the service status and restart the service.
 #
-alias sshpass="sshpass -f ~/.sshpass"
+alias sshpass="sshpass -f ~/.config/.secret/.sshpass"
 /usr/bin/systemctl is-active nginx.service > /dev/null 2>&1
 NGINX_SERVICE_STATUS="$?"
 

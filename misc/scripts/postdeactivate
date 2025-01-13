@@ -1,0 +1,14 @@
+#!/bin/bash
+# This hook is sourced after this virtualenv is deactivated.
+
+unset DOLLAR
+unset DOMAIN_NAME
+unset DOMAIN_NAMES
+unset SERVER_LOCATION
+unset DOTENV_PRIVATE_KEY
+unset DOTENV_PRIVATE_KEY_CI
+unalias sshpass
+unalias stopweb
+unalias startweb
+unalias restartweb
+unalias runsslserver
