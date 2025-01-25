@@ -1,0 +1,234 @@
+#
+# Dockerfile for Django applications.
+#
+
+#
+# Set the python version as a build-time argument
+# with Python 3.13 as the default
+#
+ARG PYTHON_VERSION=3.13-slim
+#
+# Base Image
+#
+FROM python:${PYTHON_VERSION} AS base
+
+#
+# Set Python-related environment variables
+#
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_ROOT_USER_ACTION=ignore
+ENV PIPENV_VERBOSITY=-1
+
+#
+# Django Application related environment variables.
+#
+ENV VIRTUAL_ENV=/opt/venv \
+    PORT=9000 \
+    PATH=/opt/venv/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH
+
+#
+# SHELL
+#
+SHELL ["/bin/bash", "-c"]
+
+#
+# Ports exposed by the container.
+#
+EXPOSE 9000
+EXPOSE 80
+EXPOSE 443
+
+#
+# Update all packages (Security).
+#
+RUN apt-get update --yes --quiet && \
+    apt-get install --yes --quiet --no-install-recommends \
+    build-essential \
+    python3-launchpadlib && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+#
+# Install Nginx
+#
+RUN apt-get --yes --quiet update && \
+    apt-get install --yes --quiet software-properties-common && \
+    add-apt-repository ppa:git-core/candidate && \
+    apt-get install --yes --quiet git
+
+RUN apt-get update --yes --quiet && \
+    apt-get install --yes --quiet cron curl openssl sudo apache2-utils && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get install --yes --quiet gnupg ca-certificates lsb-release debian-archive-keyring && \
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null && \
+    gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/debian `lsb_release -cs` nginx" | tee /etc/apt/sources.list.d/nginx.list && \
+    echo -e "Package: *\nPin: origin nginx.org\nPin: release o=nginx\nPin-Priority: 900\n" \ | tee /etc/apt/preferences.d/99nginx && \
+    apt-get update --yes --quiet && \
+    apt-get install nginx --yes --quiet
+
+#
+# Install OS dependencies.
+#
+RUN apt-get update --yes --quiet && \
+    apt-get install --yes --quiet \
+    libpq-dev \
+    libjpeg-dev \
+    libcairo2 \
+    gcc && \
+    rm -rf /var/lib/apt/lists/*
+
+#
+# Clean up apt cache to reduce image size.
+#
+RUN apt-get remove --purge --yes --quiet && \
+    apt-get autoremove --yes --quiet && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+#
+# Create WORKDIR and set it as the working directory.
+#
+RUN useradd django --create-home && \
+    adduser --system --no-create-home --shell /bin/false --group --disabled-login nginx && \
+    usermod -a -G django nginx && \
+    mkdir /app $VIRTUAL_ENV && \
+    chmod 0710 /app && \
+    mkdir -p /etc/nginx/ssl /etc/nginx/htpasswd /var/www/default /etc/letsencrypt && \
+    mkdir -p /var/log/gunicorn && \
+    chmod 0711 /var/log/gunicorn && \
+    chown django:nginx /var/log/gunicorn && \
+    chown django:nginx /app && \
+    chown -R django $VIRTUAL_ENV
+
+WORKDIR /app
+
+#
+# Copy the required configuration files.
+#
+COPY ./misc/prod/nginx.conf /etc/nginx/nginx.conf
+COPY ./misc/prod/default.d/general.conf /etc/nginx/default.d/general.conf
+COPY ./misc/prod/default.d/letsencrypt.conf /etc/nginx/default.d/letsencrypt.conf
+COPY ./misc/prod/default.d/security.conf /etc/nginx/default.d/security.conf
+COPY ./misc/prod/conf.d/vh_localhost.conf /etc/nginx/conf.d/vh_localhost.conf
+COPY ./misc/prod/conf.d/vh_${DOMAIN_NAME}.conf /etc/nginx/conf.d/vh_${DOMAIN_NAME}.conf
+COPY ./misc/prod/logrotate.d/nginx /etc/logrotate.d/nginx
+COPY ./misc/prod/logrotate.d/gunicorn /etc/logrotate.d/gunicorn
+COPY ./misc/prod/django_sudo /etc/sudoers.d/django_sudo
+COPY ./misc/scripts/runner.sh /usr/local/bin/runner.sh
+#
+# Generate using the following commands to speed up the build process.
+#
+# https://mkcert.dev/
+#
+# mkdir ssl
+# brew install openssl mkcert
+# openssl dhparam -out ./ssl/dhparam.pem 4096
+# export CAROOT="./ssl"
+# mkcert -install
+# mkcert -cert-file ./ssl/cert.pem -key-file ./ssl/key.pem localhost domain.tld
+# "*.domain.tld" 127.0.0.1 ::1
+# unset CAROOT
+#
+# htpasswd -c ./ssl/.htpasswd user1
+#
+# https://dotenvx.com/docs/env-keys-file
+#
+# echo "DOTENV_PRIVATE_KEY=${DOTENV_PRIVATE_KEY}" > ssl/envfile
+#
+COPY ./ssl/rootCA.pem /etc/nginx/ssl/rootCA.pem
+COPY ./ssl/cert.pem /etc/nginx/ssl/cert.pem
+COPY ./ssl/key.pem /etc/nginx/ssl/key.pem
+COPY ./ssl/dhparam.pem /etc/nginx/ssl/dhparam.pem
+COPY ./ssl/envfile /opt/venv/bin/envfile
+COPY ./ssl/.htpasswd /etc/nginx/htpasswd/.htpasswd
+COPY ./misc/prod/default/error.html /var/www/default/error.html
+
+#
+# Make the bash script executable
+#
+RUN chmod +x /usr/local/bin/runner.sh
+
+#
+# Link logs to stdout and stderr
+#
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
+    ln -sf /dev/stderr /var/log/nginx/error.log && \
+    ln -sf /dev/stdout /var/log/nginx/${DOMAIN_NAME}.access.log && \
+    ln -sf /dev/stderr /var/log/nginx/${DOMAIN_NAME}.error.log && \
+    ln -sf /dev/stdout /var/log/gunicorn/django.log
+
+RUN visudo -cf /etc/sudoers.d/django_sudo
+
+#
+# Install dotenvx (https://dotenvx.com/docs/install)
+#
+RUN curl -sfS https://dotenvx.sh | sh
+
+#
+# Create a virtual environment
+#
+RUN python -m venv $VIRTUAL_ENV
+RUN chown -R django $VIRTUAL_ENV
+
+#
+# Build Image
+#
+FROM base AS build
+
+#
+# Switch to user django
+#
+USER django
+
+#
+# Install Homebrew
+#
+RUN /bin/bash -c \
+    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+#
+# Install Redis and nodejs.
+#
+RUN brew update && brew upgrade && \
+    brew install pipenv node nodejs redis pnpm gcc && \
+    brew cleanup
+
+
+#
+# Upgrade pip
+#
+RUN $VIRTUAL_ENV/bin/python -m pip install --upgrade pip
+
+#
+# Copy application code.
+#
+COPY --chown=django ./pnpm-lock.yaml .
+COPY --chown=django ./package.json .
+COPY --chown=django . .
+
+#
+# Install frontend (TailwindCSS).
+#
+RUN . $VIRTUAL_ENV/bin/activate
+RUN pipenv install --deploy
+RUN pipenv install --deploy --dev
+RUN DOTENV_PRIVATE_KEY=$(cat /opt/venv/bin/envfile) pipenv run \
+    /usr/local/bin/dotenvx run \
+    --env-file=.env \
+    --overload -- ${VIRTUAL_ENV}/bin/python manage.py collectstatic \
+    --noinput --clear
+RUN pnpm install && \
+    pnpm tailwind-build
+
+#
+# Run the Django project via the runtime script
+# when the container starts
+#
+# docker run --publish 80:80 --publish 443:443 --publish 9000:9000 --volume
+# /etc/letsencrypt:/etc/letsencrypt --name ${DOMAIN_NAME} django_gunicorn_nginx
+#
+CMD /usr/local/bin/runner.sh

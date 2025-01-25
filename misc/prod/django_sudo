@@ -1,0 +1,2 @@
+## Allow django to run any commands anywhere
+django ALL=(ALL) NOPASSWD: ALL

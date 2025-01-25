@@ -1,0 +1,11 @@
+[Unit]
+Description=Gunicorn socket
+
+[Socket]
+ListenStream=${VIRTUAL_ENV}/bin/gunicorn.sock
+SocketUser=${USER}
+SocketGroup=nginx
+SocketMode=660
+
+[Install]
+WantedBy=sockets.target

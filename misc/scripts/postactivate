@@ -1,0 +1,43 @@
+#!/bin/bash
+# This hook is sourced after this virtualenv is activated.
+
+#
+# Nginx
+#
+export DOLLAR="$"
+export DOMAIN_NAME="domain.tld"
+export DOMAIN_NAMES="domain.tld www.domain.tld"
+export SERVER_LOCATION="IT-ROMA-01"
+
+#
+# Dotenvx
+#
+export DOTENV_PRIVATE_KEY="your_dotenvx_private_key_you_find_in_dot_env_keys_file"
+export DOTENV_PRIVATE_KEY_CI="your_ci_dotenvx_private_key_you_find_in_dot_env_keys_file"
+
+#
+# Alias to run development server in SSL Port 443
+#
+alias sshpass="sshpass -f ~/.config/.secret/.sshpass"
+alias stopweb="sshpass sudo \
+  systemctl stop nginx.service \
+  gunicorn.service \
+  gunicorn.socket; \
+  brew services stop redis"
+alias startweb="sshpass sudo \
+  systemctl start nginx.service \
+  gunicorn.service \
+  gunicorn.socket; \
+  brew services start redis"
+alias restartweb="sshpass sudo \
+  systemctl restart nginx.service; \
+  gunicorn.service; \
+  gunicorn.socket; \
+  brew services restart redis"
+alias runsslserver="sshpass sudo \
+  DOTENV_PRIVATE_KEY=your_dotenvx_private_key_you_find_in_dot_env_keys_file \
+  /home/linuxbrew/.linuxbrew/bin/dotenvx run -- \
+  $VIRTUAL_ENV/bin/python manage.py runserver_plus 443 \
+  --cert-file /etc/letsencrypt/live/domain.tld/fullchain.pem \
+  --key-file /etc/letsencrypt/live/domain.tld/privkey.pem \
+  --nostatic"

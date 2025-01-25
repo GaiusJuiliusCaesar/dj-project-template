@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Application Status</title>
+    <style>
+      html {
+        background-color: #8B0000;
+      }
+      body {
+        color: #fefefe;
+      }
+    </style>
+  </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--# if expr="$status = 502" -->
+      <meta http-equiv="refresh" content="2">
+    <!--# endif -->
+  </head>
+<body>
+<div class="error-middle" style="text-align: center;">
+  <!--# if expr="$status = 502" -->
+  <h1>Application is under maintenance.</p></h1>
+    <p>This is only for a few seconds, you will be redirected.</p>
+  <!--# else -->
+    <h1><!--# echo var="status" default="" --> <!--# echo var="status_text" default="Something goes wrong" --></h1>
+  <!--# endif -->
+</div>
+</body>
+</html>

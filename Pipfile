@@ -1,0 +1,43 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+asgiref = "*"
+dj-database-url = "*"
+dj-email-url = "*"
+django = "*"
+django-appconf = "*"
+django-cache-url = "*"
+django-cors-headers = "*"
+django-crontab = "*"
+django-hosts = "*"
+django-redis = "*"
+django-csp = "*"
+gunicorn = "*"
+markdown = "*"
+packaging = "*"
+pillow = "*"
+psycopg2-binary = "*"
+rcssmin = "*"
+redis = "*"
+rjsmin = "*"
+sqlparse = "*"
+typing-extensions = "*"
+whitenoise = "*"
+django-permissions-policy = "*"
+django-dbbackup = "*"
+pygments = "*"
+django-extensions = "*"
+werkzeug = "*"
+django-health-check = "*"
+psutil = "*"
+
+[dev-packages]
+pyopenssl = "*"
+black = "*"
+ruff = "*"
+
+[requires]
+python_version = "3.13"

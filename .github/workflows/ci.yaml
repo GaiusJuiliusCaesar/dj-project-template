@@ -1,0 +1,56 @@
+---
+#
+# Github Workflow for Django
+#
+name: Django CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.13]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        sudo add-apt-repository ppa:deadsnakes/ppa
+        sudo apt-get update
+        sudo apt-get install -y lsb-release curl gpg
+        sudo apt-get install -y python3.13
+        curl -sfS https://dotenvx.sh | sh
+        curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+        sudo chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+        sudo apt-get install -y redis
+        sudo systemctl enable redis-server
+        sudo systemctl start redis-server
+        python -m pip install --upgrade pip
+        python -m pip install --user pipenv
+        python -m pip install --user virtualenvwrapper
+      env:
+        PIP_ROOT_USER_ACTION: ignore
+    - name: Run Tests
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pipenv --venv
+        pipenv install --deploy --dev
+        pipenv run ruff check .
+      env:
+        PIPENV_VERBOSITY: -1
+        DOTENV_PRIVATE_KEY_CI: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
+...
