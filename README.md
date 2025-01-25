@@ -12,7 +12,7 @@ Create a website/application using Django using this template.
 ## Basic Setup
 
 - Login into your Liunx Desktop or WSL.
-- Install Homebrew as following with  user having sudo privileges.
+- Install Homebrew as following with user having sudo privileges.
 
 ```sh
 $ whoami
