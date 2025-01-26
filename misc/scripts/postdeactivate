@@ -7,6 +7,7 @@ unset DOMAIN_NAMES
 unset SERVER_LOCATION
 unset DOTENV_PRIVATE_KEY
 unset DOTENV_PRIVATE_KEY_CI
+unset DOTENV_PRIVATE_KEY_PRODUCTION
 unalias sshpass
 unalias stopweb
 unalias startweb

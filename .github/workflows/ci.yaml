@@ -28,28 +28,26 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo add-apt-repository ppa:deadsnakes/ppa
-        sudo apt-get update
-        sudo apt-get install -y lsb-release curl gpg
-        sudo apt-get install -y python3.13
+        sudo apt-get -y -q update
+        sudo apt-get install -y -q lsb-release curl gpg
         curl -sfS https://dotenvx.sh | sh
+        curl -LsSf https://astral.sh/ruff/install.sh | sh
+        curl -LsSf https://astral.sh/uv/install.sh | sh
         curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
         sudo chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-        sudo apt-get install -y redis
+        sudo apt-get install -y -q redis
         sudo systemctl enable redis-server
         sudo systemctl start redis-server
         python -m pip install --upgrade pip
-        python -m pip install --user pipenv
-        python -m pip install --user virtualenvwrapper
       env:
         PIP_ROOT_USER_ACTION: ignore
     - name: Run Tests
       run: |
-        python -m venv venv
-        source venv/bin/activate
-        pipenv --venv
-        pipenv install --deploy --dev
-        pipenv run ruff check .
+        uv venv
+        source .venv/bin/activate
+        uv sync
+        uv run ruff check .
       env:
         PIPENV_VERBOSITY: -1
         DOTENV_PRIVATE_KEY_CI: ${{ secrets.DOTENV_PRIVATE_KEY_CI }}
