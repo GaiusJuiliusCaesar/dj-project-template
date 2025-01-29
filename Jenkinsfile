@@ -6,23 +6,28 @@
 
 pipeline {
   agent {
-    dockerfile {
-      filename 'Dockerfile.ci'
       label 'linux'
-      customWorkspace '/home/jenkins/workspace'
-    }
   }
   stages {
-    stage('Check') {
+    stage('Build') {
       steps {
-        sh 'python --version'
+        sh 'docker build -t dj_template -f Dockerfile.ci .'
+      }
+    }
+    stage('Run') {
+      steps {
+        sh 'docker run --rm dj_template'
       }
     }
   }
   post {
     always {
-      /* Clean up our workspace */
-      deleteDir()
+      script {
+        /* Clean up our workspace */
+        if (getContext (hudson.FilePath)) {
+          deleteDir()
+        }
+      }
     }
     success {
       echo 'I succeeded!'
