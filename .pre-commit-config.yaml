@@ -87,6 +87,6 @@ repos:
     hooks:
       - id: jenkinsfile-lint
         name: jenkinsfile-lint
-        entry: bash -c 'sh -x ./misc/scripts/validate_jenkinsfile.sh'
+        entry: bash -c './misc/scripts/validate_jenkinsfile.sh'
         language: system
 ...

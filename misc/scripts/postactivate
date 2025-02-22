@@ -14,6 +14,7 @@ export SERVER_LOCATION="IT-ROMA-01"
 #
 export DOTENV_PRIVATE_KEY="your_dotenvx_private_key_you_find_in_dot_env_keys_file"
 export DOTENV_PRIVATE_KEY_CI="your_ci_dotenvx_private_key_you_find_in_dot_env_keys_file"
+export DOTENV_PRIVATE_KEY_PRODUCTION="your_production_dotenvx_private_key_you_find_in_dot_env_keys_file"
 
 #
 # Alias to run development server in SSL Port 443
@@ -30,8 +31,8 @@ alias startweb="sshpass sudo \
   gunicorn.socket; \
   brew services start redis"
 alias restartweb="sshpass sudo \
-  systemctl restart nginx.service; \
-  gunicorn.service; \
+  systemctl restart nginx.service \
+  gunicorn.service \
   gunicorn.socket; \
   brew services restart redis"
 alias runsslserver="sshpass sudo \
